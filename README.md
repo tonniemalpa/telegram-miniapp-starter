@@ -56,7 +56,7 @@ npx tgcloud push
 
 **6. Open it from the bot.** In @BotFather set your bot's Mini App or menu button URL to the same address. Send `/start` to your bot and tap **Open app**. You should see "Hello, <your name>".
 
-**7. Connect LaPoe.** Follow the Mini App section of your LaPoe dashboard and put the integration in `web/lapoe.js`. Add your app's address to LaPoe where it asks for allowed domains, then `npx tgcloud push`. Tap **Support** in the app: the chat opens and answers.
+**7. Connect LaPoe.** In your LaPoe dashboard, open the Mini App section and copy your key, the `data-lapoe-key` value that starts with `lp_`. Set `LAPOE_KEY` in `web/lapoe.js` to it. In the dashboard, add your app's address (`app<id>.tgcloud.ai`) to the allowed domains, then run `npx tgcloud push`. Tap **Support** in the app: the chat opens and answers.
 
 ## Add features with recipes
 

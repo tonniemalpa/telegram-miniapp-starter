@@ -55,8 +55,8 @@ Adapt a recipe after adding it: rename tables and labels to fit the user's idea,
 
 ## LaPoe live chat (keep it working)
 
-- `web/lapoe.js` is the only LaPoe file. `initLaPoe()` loads the chat, and `openSupport()` opens it from the Support button. Keep a visible way to reach support in every layout.
-- Use the integration from the **Mini App section of the user's LaPoe dashboard** (https://lapoe.app). Do not substitute generic website-widget instructions or guess. If you can't see the dashboard, ask the user to paste those instructions. Never ask for their password.
+- `web/lapoe.js` is the only LaPoe file. Set `LAPOE_KEY` to the user's key: the `data-lapoe-key` value, starting with `lp_`, from the **Mini App section of their LaPoe dashboard** (https://lapoe.app). `initLaPoe()` loads `https://lapoe.app/widget.js` with that key. `openSupport()` calls `window.LaPoe.open()` from the Support button. The widget also adds its own floating chat button. Keep a visible way to reach support in every layout.
+- If you can't see the dashboard, ask the user to copy the key from its Mini App section. Do not guess it, and never ask for their password.
 - The app's address (`app<id>.tgcloud.ai`) must be added wherever LaPoe asks for allowed domains.
 - Suggest that the user add their app's FAQ to LaPoe Knowledge, so the chat gives real answers.
 - Test inside Telegram: the chat opens, a message sends, LaPoe replies, and the app keeps working.
