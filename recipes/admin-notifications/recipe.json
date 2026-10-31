@@ -1,0 +1,14 @@
+{
+  "description": "Owner alerts for new users, /stats, and an adminOnly() helper for your own admin commands",
+  "insert": [
+    { "file": "tgcloud/lib/extensions.js", "marker": "// --- recipe imports ---", "text": "import { stats, notifyNewUser } from './admin.js';" },
+    { "file": "tgcloud/lib/extensions.js", "marker": "// --- recipe commands ---", "text": "  '/stats': stats," },
+    { "file": "tgcloud/lib/extensions.js", "marker": "// --- recipe new user hooks ---", "text": "  notifyNewUser," }
+  ],
+  "next": [
+    "Send /myid to your bot and put the number in adminChatId in tgcloud/lib/config.js",
+    "npx tgcloud push",
+    "Open the Mini App from another Telegram account: you get a 'New user' message",
+    "Send /stats to the bot"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "description": "Take TON payments with TON Connect and verify them on-chain (testnet by default)",
+  "insert": [
+    { "file": "web/index.html", "marker": "<!-- --- recipe scripts --- -->", "text": "  <script src=\"https://unpkg.com/@tonconnect/ui@2/dist/tonconnect-ui.min.js\"></script>" },
+    { "file": "tgcloud.jsonc", "marker": "// --- recipe headers ---", "text": "      { \"path\": \"/tonconnect-manifest.json\", \"set\": { \"Access-Control-Allow-Origin\": \"*\" } }," },
+    { "file": "web/features.js", "marker": "// --- recipe imports ---", "text": "import tonPayments from './recipes/ton-payments.js';" },
+    { "file": "web/features.js", "marker": "// --- recipe features ---", "text": "  tonPayments," }
+  ],
+  "next": [
+    "Set receiverAddress (your testnet wallet) and tonItems in tgcloud/lib/ton.js",
+    "Replace both appXXXXXX in web/tonconnect-manifest.json with your app address, and set its name",
+    "npx tgcloud push",
+    "npx tgcloud migrate   (creates the ton_payments table; confirm when asked)",
+    "Open the Mini App, connect a testnet wallet, pay the demo item"
+  ]
+}

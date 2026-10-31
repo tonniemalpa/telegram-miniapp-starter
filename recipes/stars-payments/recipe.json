@@ -1,0 +1,17 @@
+{
+  "description": "Sell digital goods for Telegram Stars: invoice, pre-checkout check, payment record, /paysupport, admin /refund",
+  "insert": [
+    { "file": "tgcloud/lib/extensions.js", "marker": "// --- recipe imports ---", "text": "import { onSuccessfulPayment, paySupport, refundStars } from './stars.js';" },
+    { "file": "tgcloud/lib/extensions.js", "marker": "// --- recipe commands ---", "text": "  '/paysupport': paySupport,\n  '/refund': refundStars," },
+    { "file": "tgcloud/lib/extensions.js", "marker": "// --- recipe message hooks ---", "text": "  onSuccessfulPayment," },
+    { "file": "web/features.js", "marker": "// --- recipe imports ---", "text": "import starsPayments from './recipes/stars-payments.js';" },
+    { "file": "web/features.js", "marker": "// --- recipe features ---", "text": "  starsPayments," }
+  ],
+  "next": [
+    "Edit starsItems in tgcloud/lib/stars.js (what users can buy and for how many Stars)",
+    "npx tgcloud push",
+    "npx tgcloud migrate   (creates the stars_purchases table; confirm when asked)",
+    "npx tgcloud webhook   (must say in sync; if not: npx tgcloud webhook sync)",
+    "Buy the demo item in the Mini App (costs 1 real Star), then /refund it as admin"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/@tgcloud/cli/schema/tgcloud.json",
+  // The Mini App front end: plain HTML/CSS/JS, no build step, so
+  // `npx tgcloud push` deploys the web/ folder as it is.
+  "static": {
+    "source": "web",
+    "headers": [
+      // --- recipe headers ---
+    ]
+  }
+}

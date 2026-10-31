@@ -1,0 +1,68 @@
+/* Telegram theme colours with fallbacks for testing outside Telegram. */
+:root {
+  --bg: var(--tg-theme-bg-color, #ffffff);
+  --bg2: var(--tg-theme-secondary-bg-color, #f2f2f7);
+  --section: var(--tg-theme-section-bg-color, #ffffff);
+  --text: var(--tg-theme-text-color, #111111);
+  --hint: var(--tg-theme-hint-color, #8a8a8e);
+  --link: var(--tg-theme-link-color, #2481cc);
+  --button: var(--tg-theme-button-color, #2481cc);
+  --button-text: var(--tg-theme-button-text-color, #ffffff);
+  --accent: var(--tg-theme-accent-text-color, #2481cc);
+  --danger: var(--tg-theme-destructive-text-color, #e53935);
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--bg2);
+  color: var(--text);
+  font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Keep content clear of Telegram's header and device notches. */
+  padding:
+    calc(var(--tg-content-safe-area-inset-top, 0px) + 10px)
+    calc(var(--tg-content-safe-area-inset-right, 0px) + 16px)
+    calc(var(--tg-content-safe-area-inset-bottom, 0px) + 24px)
+    calc(var(--tg-content-safe-area-inset-left, 0px) + 16px);
+}
+
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; color: var(--hint); margin: 0 0 10px; }
+p { margin: 0 0 8px; }
+p:last-child { margin-bottom: 0; }
+code { font-size: 13px; }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+.logo { width: 30px; height: 30px; border-radius: 8px; }
+
+.card { background: var(--section); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+
+.muted { color: var(--hint); }
+.small { font-size: 13px; }
+.error { color: var(--danger); }
+.success { color: var(--accent); font-weight: 600; }
+.notice { padding: 12px; border-radius: var(--radius); background: var(--section); margin-bottom: 12px; }
+
+button { font: inherit; cursor: pointer; }
+button:disabled { opacity: .5; cursor: default; }
+button.primary { width: 100%; padding: 13px; border: 0; border-radius: var(--radius); background: var(--button); color: var(--button-text); font-weight: 700; }
+button.secondary { padding: 8px 14px; border: 1px solid var(--button); border-radius: 10px; background: transparent; color: var(--button); font-weight: 600; }
+button.secondary.small { padding: 6px 12px; font-size: 14px; }
+button.link { border: 0; background: none; color: var(--link); padding: 0 0 0 6px; }
+
+input, textarea {
+  width: 100%; padding: 11px 12px; border: 0; border-radius: 10px;
+  background: var(--bg2); color: var(--text); font: inherit; outline: none;
+}
+
+/* Shared layout helpers for feature cards. */
+.row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.row + .row { margin-top: 10px; }
+.stack > * + * { margin-top: 10px; }
+.list { list-style: none; margin: 0; padding: 0; }
+.list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--bg2); }
+.list li:first-child { border-top: 0; }

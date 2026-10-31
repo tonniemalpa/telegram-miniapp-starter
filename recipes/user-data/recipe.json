@@ -1,0 +1,12 @@
+{
+  "description": "Save, list and delete per-user records (notes), each user sees only their own",
+  "insert": [
+    { "file": "web/features.js", "marker": "// --- recipe imports ---", "text": "import userData from './recipes/user-data.js';" },
+    { "file": "web/features.js", "marker": "// --- recipe features ---", "text": "  userData," }
+  ],
+  "next": [
+    "npx tgcloud push",
+    "npx tgcloud migrate   (creates the notes table; confirm when asked)",
+    "Open the Mini App: add a note, reopen the app, delete it"
+  ]
+}

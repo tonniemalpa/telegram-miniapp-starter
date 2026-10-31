@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>My Mini App</title>
+  <!-- Must be the first script (Telegram Mini Apps docs). -->
+  <script src="https://telegram.org/js/telegram-web-app.js?64"></script>
+  <!-- --- recipe scripts --- -->
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <img src="icon.png" alt="" class="logo">
+      <span id="app-name">My Mini App</span>
+    </div>
+    <button id="support-btn" class="secondary small" type="button">Support</button>
+  </header>
+
+  <main>
+    <div id="fatal" class="notice error" hidden></div>
+
+    <section class="card" id="me-card">
+      <div id="me-loading" class="muted">Loading…</div>
+      <div id="me-error" class="error" hidden>
+        <span id="me-error-text"></span>
+        <button id="me-retry" class="link" type="button">Try again</button>
+      </div>
+      <div id="me" hidden>
+        <h1 id="greeting"></h1>
+        <p class="muted" id="visits"></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Start building</h2>
+      <p>This is the starter screen. Describe your idea to your AI and it will build it here.</p>
+      <p class="muted small">Front end: <code>web/</code> · Backend: <code>tgcloud/</code> · Guide for AI: <code>AGENTS.md</code></p>
+    </section>
+
+    <div id="features"></div>
+  </main>
+</body>
+</html>

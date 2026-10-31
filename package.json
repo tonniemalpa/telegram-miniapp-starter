@@ -1,0 +1,20 @@
+{
+  "name": "telegram-miniapp-starter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Starter for Telegram Mini Apps on Telegram Serverless, with LaPoe live chat and ready-to-add recipes.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "deploy": "tgcloud push",
+    "migrate": "tgcloud migrate",
+    "status": "tgcloud status",
+    "recipe": "node scripts/add-recipe.js",
+    "test": "node --import ./tests/mock/register.js --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "@tgcloud/cli": "^0.2.0"
+  }
+}
