@@ -22,17 +22,28 @@ Building with AI? Point your AI at [`AGENTS.md`](AGENTS.md).
 
 ## Setup
 
-**1. Get your copy.** On GitHub click **Use this template** → **Create a new repository**, then clone your new repo:
+Run every command from the **project folder**: the folder that contains `package.json`.
+
+**1. Get your copy.** Pick one:
+
+- **With git.** On GitHub click **Use this template** → **Create a new repository**, then:
+
+  ```bash
+  git clone https://github.com/<you>/<your-repo>.git
+  cd <your-repo>
+  ```
+
+- **Without git.** Click **Code** → **Download ZIP** and unzip it. The unzipped folder contains another folder, `telegram-miniapp-starter-main`. That inner folder is the project folder: open your terminal there.
+
+Then install:
 
 ```bash
-git clone https://github.com/<you>/<your-repo>.git
-cd <your-repo>
 npm install
 ```
 
-With the GitHub CLI: `gh repo create my-mini-app --template tonniemalpa/telegram-miniapp-starter --private --clone`
+**2. Turn on Serverless.** Serverless is in the **BotFather app**, not in the `/mybots` chat menu. Open [@BotFather](https://t.me/BotFather), tap its **Open** button, choose your bot, then **Serverless**, and switch it on. Then open **CLI Access** and copy the access token. It looks like `app<id>:<secret>` and is not your bot token. Keep it private.
 
-**2. Turn on Serverless.** In @BotFather open your bot → **Serverless** and switch it on. Then open **CLI Access** and copy the access token. It looks like `app<id>:<secret>` and is not your bot token. Keep it private.
+Use a bot made for this app only. `push` replaces everything in that bot's Serverless project.
 
 **3. Link the project to your bot.**
 
@@ -48,15 +59,30 @@ npx tgcloud push     # prints your app address, e.g. https://app123456.tgcloud.a
 npx tgcloud migrate  # creates the users table (confirm when asked)
 ```
 
-**5. Configure.** In `tgcloud/lib/config.js`, set `miniAppUrl` to the address from step 4 and `appName` to your app's name. Send `/myid` to your bot and put the number in `adminChatId`. Then deploy again:
+**5. Configure.** Send `/myid` to your bot to get your numeric ID. In `tgcloud/lib/config.js`, set:
+
+- `miniAppUrl`: the address from step 4
+- `appName`: your app's name
+- `adminChatId`: your ID, as a plain number with no quotes
+
+Check that no `XXXXXX` or placeholder text is left, then deploy again:
 
 ```bash
 npx tgcloud push
 ```
 
-**6. Open it from the bot.** In @BotFather set your bot's Mini App or menu button URL to the same address. Send `/start` to your bot and tap **Open app**. You should see "Hello, <your name>".
+**6. Open it from the bot.** In @BotFather, send `/mybots`, choose your bot, then **Bot Settings** → **Configure Mini App** (or **Menu Button**), and set the URL to the same address. Send `/start` to your bot: it should reply "Welcome to …" with an **Open app** button. Tap it. You should see "Hello, <your name>".
 
-**7. Connect LaPoe.** In your LaPoe dashboard, open the Mini App section and copy your key, the `data-lapoe-key` value that starts with `lp_`. Set `LAPOE_KEY` in `web/lapoe.js` to it. In the dashboard, add your app's address (`app<id>.tgcloud.ai`) to the allowed domains, then run `npx tgcloud push`. Tap **Support** in the app: the chat opens and answers.
+**7. Connect LaPoe.**
+
+1. In your LaPoe dashboard, open the Mini App section and copy the snippet: `<script src="https://lapoe.app/widget.js" data-lapoe-key="lp_..." defer></script>`.
+2. Paste it into `web/index.html`, on the line under `LaPoe live chat`.
+3. In the dashboard, add your app address (`https://app<id>.tgcloud.ai`) to the allowed domains.
+4. Run `npx tgcloud push`.
+
+Open the app: a chat button appears, and **Support** opens the same chat.
+
+Edit files in a code editor such as VS Code, and keep them saved as UTF-8. Creating files with PowerShell `echo` or `Set-Content` can break emoji and special characters.
 
 ## Add features with recipes
 
@@ -82,7 +108,7 @@ web/                     Front end, deployed as-is by `tgcloud push`
   app.js                 Loads the user, mounts feature cards
   api.js                 call(endpoint, input) and errorText(err)
   features.js            Feature cards on the home screen (recipes register here)
-  lapoe.js               LaPoe live chat (the only LaPoe file)
+  lapoe.js               Support button (the LaPoe snippet goes in index.html)
   styles.css             Telegram theme colours and shared styles
 tgcloud/                 Everything Serverless runs
   schema.js              Database tables

@@ -47,17 +47,19 @@ Avoid import cycles. `lib/users.js` imports `lib/extensions.js`, so modules regi
 Before writing a feature, check `recipes/`. If one fits, run `npm run recipe -- <name>` and follow its README:
 
 - `user-data`: per-user records with ownership checks. This is the base pattern for most apps.
-- `stars-payments`: Telegram Stars, which Telegram **requires for digital goods**.
+- `stars-payments`: charge users in Telegram Stars. Telegram requires Stars for digital goods and services sold inside bots and Mini Apps.
 - `ton-payments`: TON Connect payments verified on-chain, testnet by default.
 - `admin-notifications`: new-user alerts, `/stats`, `adminOnly()`.
 
 Adapt a recipe after adding it: rename tables and labels to fit the user's idea, and remove what isn't needed.
 
+**Build what the user asked for.** Never swap their feature for a different one because a recipe exists. Payments are the main case: use the method their idea names (Stars, TON, USDT…). If a Telegram rule may affect it, explain the rule and let the user decide. For example, an app that *sells* Telegram Stars cannot charge in Stars, and USDT on TON needs a jetton transfer, which no recipe covers yet. Never change the idea silently.
+
 ## LaPoe live chat (keep it working)
 
-- `web/lapoe.js` is the only LaPoe file. Set `LAPOE_KEY` to the user's key: the `data-lapoe-key` value, starting with `lp_`, from the **Mini App section of their LaPoe dashboard** (https://lapoe.app). `initLaPoe()` loads `https://lapoe.app/widget.js` with that key. `openSupport()` calls `window.LaPoe.open()` from the Support button. The widget also adds its own floating chat button. Keep a visible way to reach support in every layout.
-- If you can't see the dashboard, ask the user to copy the key from its Mini App section. Do not guess it, and never ask for their password.
-- The app's address (`app<id>.tgcloud.ai`) must be added wherever LaPoe asks for allowed domains.
+- The user pastes the snippet from the **Mini App section of their LaPoe dashboard** (https://lapoe.app) into `web/index.html`, on the line under the `LaPoe live chat` comment. The snippet looks like `<script src="https://lapoe.app/widget.js" data-lapoe-key="lp_..." defer></script>`. Never make them dig out the key. If you can't see the dashboard, ask them to paste the snippet. Never ask for their password.
+- The widget exposes `window.LaPoe.open()`, `close()` and `reset()`, and shows its own floating chat button. The Support button calls `openSupport()` in `web/lapoe.js`. Keep a visible way to reach support in every layout, and don't cover the floating button with fixed bottom bars.
+- The app address (`https://app<id>.tgcloud.ai`) must be added to the allowed domains in the LaPoe dashboard. With or without `https://` both work.
 - Suggest that the user add their app's FAQ to LaPoe Knowledge, so the chat gives real answers.
 - Test inside Telegram: the chat opens, a message sends, LaPoe replies, and the app keeps working.
 
@@ -70,6 +72,14 @@ Adapt a recipe after adding it: rename tables and labels to fit the user's idea,
 5. Finish with a full test in Telegram, and list honestly anything that wasn't tested.
 
 The user does some steps by hand, because an agent can't: everything in @BotFather (Serverless switch, CLI token, Mini App URL), the LaPoe dashboard, and tests on their phone. Give exact instructions for those and wait for the result.
+
+## Code and UI quality
+
+- Give or write **complete files**, not fragments, and state the exact path and whether the file is new or replaced.
+- Front end: reuse `web/styles.css` (`card`, `primary`, `secondary`, `small`, `list`, `row`, `stack`, `muted`, `error`, `success`). Never leave unstyled default buttons. Follow Telegram theme variables so light and dark mode both work. Every action shows loading, success and error states.
+- Use `textContent` for user or server data, never `innerHTML` with it.
+- Files must be UTF-8. Tell users to edit in a code editor such as VS Code, never to create code files with PowerShell `echo`, `>` or `Set-Content`, which can turn emoji into `?`.
+- Backend errors to show to users: `throw new EndpointError(message, { code })` with `EndpointError` imported from `sdk`. There is no `sdk/errors`.
 
 ## Testing
 

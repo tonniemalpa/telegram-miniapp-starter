@@ -2,6 +2,8 @@
 
 Sell digital goods and services inside your Mini App. Telegram requires Stars (currency `XTR`) for digital goods sold in bots and Mini Apps.
 
+Not for apps that *sell* Telegram Stars: charging Stars for Stars makes no sense. Use the payment method that app needs, such as TON (`ton-payments`) or USDT.
+
 ```bash
 npm run recipe -- stars-payments
 ```

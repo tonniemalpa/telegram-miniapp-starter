@@ -1,6 +1,6 @@
 import { call, errorText } from './api.js';
 import { features } from './features.js';
-import { initLaPoe, openSupport } from './lapoe.js';
+import { openSupport } from './lapoe.js';
 
 const tg = window.Telegram?.WebApp;
 const $ = (id) => document.getElementById(id);
@@ -57,7 +57,6 @@ async function boot() {
   tg.ready();
   tg.expand();
 
-  initLaPoe();
   $('support-btn').addEventListener('click', openSupport);
   $('me-retry').addEventListener('click', loadMe);
 
