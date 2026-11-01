@@ -12,6 +12,7 @@ npm run recipe -- <name>
 | [`user-data`](user-data/README.md) | Per-user records (notes): save, list, delete, owner-only |
 | [`stars-payments`](stars-payments/README.md) | Sell digital goods for Telegram Stars, with `/paysupport` and admin `/refund` |
 | [`ton-payments`](ton-payments/README.md) | TON payments with TON Connect, verified on-chain (testnet by default) |
+| [`usdt-payments`](usdt-payments/README.md) | USDT on TON payments with TON Connect, verified on-chain (mainnet, real money) |
 | [`admin-notifications`](admin-notifications/README.md) | New-user alerts, `/stats`, `adminOnly()` for your own admin commands |
 
 After adding a recipe, follow the "Next steps" it prints. They usually come down to:

@@ -2,6 +2,7 @@
 // Flow: createTonPayment -> TON Connect transfer with the reference as comment
 // -> checkTonPayment until the server sees it on-chain.
 import { commentPayload } from '../lib/boc.js';
+import { getTonConnect, connectedAccount } from '../lib/ton-connect.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -34,18 +35,14 @@ export default {
       setStatus('Set receiverAddress in tgcloud/lib/ton.js to enable TON payments.', 'error');
       return;
     }
-    if (!window.TON_CONNECT_UI) {
+    const wallet = getTonConnect('ton-connect-button');
+    if (!wallet) {
       setStatus('The wallet connector failed to load. Reopen the app.', 'error');
       return;
     }
 
-    const wallet = new window.TON_CONNECT_UI.TonConnectUI({
-      manifestUrl: new URL('/tonconnect-manifest.json', location.origin).href,
-      buttonRootId: 'ton-connect-button',
-    });
-
     const wrongChain = () => {
-      const chain = wallet.wallet?.account?.chain;
+      const chain = connectedAccount(wallet)?.chain;
       return Boolean(chain && chain !== catalog.chain);
     };
 

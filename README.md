@@ -9,7 +9,7 @@ It runs on Telegram's own servers, so there are no servers to host. You get:
 - **Database.** A `users` table to build on.
 - **Bot.** `/start` with an "Open app" button, plus `/myid`.
 - **Support.** LaPoe live chat behind the Support button.
-- **Recipes.** One-command features: Telegram Stars payments, TON payments, per-user data, and admin notifications.
+- **Recipes.** One-command features: Telegram Stars payments, TON payments, USDT on TON payments, per-user data, and admin notifications.
 - **Tests.** They run locally with `npm test`.
 
 Building with AI? Point your AI at [`AGENTS.md`](AGENTS.md).
@@ -96,6 +96,7 @@ npm run recipe -- user-data
 | `user-data` | Per-user records: save, list, delete |
 | `stars-payments` | Sell digital goods for Telegram Stars |
 | `ton-payments` | TON payments with TON Connect, verified on-chain |
+| `usdt-payments` | USDT on TON payments, verified on-chain (real money) |
 | `admin-notifications` | New-user alerts, `/stats`, admin-only commands |
 
 Each recipe prints its next steps, usually `npx tgcloud push` and `npx tgcloud migrate`. See [`recipes/`](recipes/README.md).

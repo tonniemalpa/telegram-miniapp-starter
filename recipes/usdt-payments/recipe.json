@@ -1,0 +1,16 @@
+{
+  "description": "Take USDT on TON with TON Connect and verify it on-chain (mainnet, real money)",
+  "insert": [
+    { "file": "web/index.html", "marker": "<!-- --- recipe scripts --- -->", "text": "  <script src=\"https://unpkg.com/@tonconnect/ui@2/dist/tonconnect-ui.min.js\"></script>" },
+    { "file": "tgcloud.jsonc", "marker": "// --- recipe headers ---", "text": "      { \"path\": \"/tonconnect-manifest.json\", \"set\": { \"Access-Control-Allow-Origin\": \"*\" } }," },
+    { "file": "web/features.js", "marker": "// --- recipe imports ---", "text": "import usdtPayments from './recipes/usdt-payments.js';" },
+    { "file": "web/features.js", "marker": "// --- recipe features ---", "text": "  usdtPayments," }
+  ],
+  "next": [
+    "Set receiverAddress (your TON wallet) and usdtItems in tgcloud/lib/usdt.js",
+    "Replace both appXXXXXX in web/tonconnect-manifest.json with your app address, and set its name",
+    "npx tgcloud push",
+    "npx tgcloud migrate   (creates the usdt_payments table; confirm when asked)",
+    "REAL MONEY: pay the 0.01 USDT demo item from a wallet that has a little USDT and about 0.1 TON"
+  ]
+}

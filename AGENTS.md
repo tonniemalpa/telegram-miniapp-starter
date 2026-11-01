@@ -49,11 +49,12 @@ Before writing a feature, check `recipes/`. If one fits, run `npm run recipe -- 
 - `user-data`: per-user records with ownership checks. This is the base pattern for most apps.
 - `stars-payments`: charge users in Telegram Stars. Telegram requires Stars for digital goods and services sold inside bots and Mini Apps.
 - `ton-payments`: TON Connect payments verified on-chain, testnet by default.
+- `usdt-payments`: USDT on TON via TON Connect, verified on-chain against the official USDT token. Mainnet only, so it uses real money.
 - `admin-notifications`: new-user alerts, `/stats`, `adminOnly()`.
 
 Adapt a recipe after adding it: rename tables and labels to fit the user's idea, and remove what isn't needed.
 
-**Build what the user asked for.** Never swap their feature for a different one because a recipe exists. Payments are the main case: use the method their idea names (Stars, TON, USDT…). If a Telegram rule may affect it, explain the rule and let the user decide. For example, an app that *sells* Telegram Stars cannot charge in Stars, and USDT on TON needs a jetton transfer, which no recipe covers yet. Never change the idea silently.
+**Build what the user asked for.** Never swap their feature for a different one because a recipe exists. Payments are the main case: use the method their idea names (Stars, TON, USDT…). If a Telegram rule may affect it, explain the rule and let the user decide. For example, an app that *sells* Telegram Stars cannot charge in Stars, so it would take TON or USDT instead. Never change the idea silently.
 
 ## LaPoe live chat (keep it working)
 

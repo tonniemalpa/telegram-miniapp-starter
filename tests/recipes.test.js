@@ -7,10 +7,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { reset, sent, apiCalls, apiResults, setFetch, rows } from 'sdk';
+import { reset, sent, apiCalls, apiResults, setFetch, rows, fetchCalls } from 'sdk';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const RECIPES = ['user-data', 'stars-payments', 'ton-payments', 'admin-notifications'];
+const RECIPES = ['user-data', 'stars-payments', 'ton-payments', 'usdt-payments', 'admin-notifications'];
 
 function copyStarter() {
   const dir = mkdtempSync(join(tmpdir(), 'starter-'));
@@ -87,13 +87,14 @@ test('installer: --list shows all recipes; unknown name fails', () => {
 
 test('all recipes together: every file parses and everything is registered', async () => {
   for (const f of jsFiles(ALL)) execFileSync(process.execPath, ['--check', f]);
-  for (const t of ['users', 'notes', 'starsPurchases', 'tonPayments']) assert.ok(schema[t], `table ${t}`);
+  for (const t of ['users', 'notes', 'starsPurchases', 'tonPayments', 'usdtPayments']) assert.ok(schema[t], `table ${t}`);
   const ext = await loadModule(ALL, 'tgcloud/lib/extensions.js');
   assert.deepEqual(Object.keys(ext.commands).sort(), ['/help', '/myid', '/paysupport', '/refund', '/start', '/stats']);
   assert.equal(ext.messageHooks.length, 1);
   assert.equal(ext.newUserHooks.length, 1);
   const features = readFileSync(join(ALL, 'web/features.js'), 'utf8');
-  for (const n of ['userData', 'starsPayments', 'tonPayments']) assert.match(features, new RegExp(`  ${n},`));
+  for (const n of ['userData', 'starsPayments', 'tonPayments', 'usdtPayments']) assert.match(features, new RegExp(`  ${n},`));
+  assert.equal((readFileSync(join(ALL, 'web/index.html'), 'utf8').match(/tonconnect-ui\.min\.js/g) || []).length, 1, 'TON Connect script added once');
   assert.match(readFileSync(join(ALL, 'web/index.html'), 'utf8'), /tonconnect-ui\.min\.js/);
   assert.match(readFileSync(join(ALL, 'tgcloud.jsonc'), 'utf8'), /tonconnect-manifest\.json/);
 });
@@ -275,4 +276,118 @@ test('admin-notifications: new user alert once; /stats admin only', async () => 
   assert.ok(sent().at(-1).reply_markup, 'non-admin gets the normal reply');
   await onMessage(msg(ADMIN, '/stats'));
   assert.match(sent().at(-1).text, /^Users: 1/);
+});
+
+// ---------- usdt-payments ----------
+
+const USDT_RAW = '0:B113A994B5024A16719F69139328EB759596C38A25F59028B146FECDC3621DFE';
+const RECEIVER_RAW = '0:' + '11'.repeat(32);
+const PAYER_RAW = '0:' + '22'.repeat(32);
+const PAYER_JW_RAW = '0:' + '33'.repeat(32);
+
+async function usdtSetup() {
+  const usdt = await loadModule(ALL, 'tgcloud/lib/usdt.js');
+  const cells = await loadModule(ALL, 'tgcloud/lib/ton-cells.js');
+  usdt.usdtSettings.receiverAddress = cells.toFriendlyAddress(RECEIVER_RAW, { bounceable: false });
+  return { usdt, cells };
+}
+
+test('usdt-payments: create builds a real transfer; paid once after the transfer appears', async () => {
+  const { cells } = await usdtSetup();
+  const usdtCatalog = await load(ALL, 'tgcloud/endpoints/usdtCatalog.js');
+  const createUsdtPayment = await load(ALL, 'tgcloud/endpoints/createUsdtPayment.js');
+  const checkUsdtPayment = await load(ALL, 'tgcloud/endpoints/checkUsdtPayment.js');
+
+  const cat = await usdtCatalog({}, ctx());
+  assert.equal(cat.network, 'mainnet');
+  assert.equal(cat.chain, '-239');
+  assert.deepEqual(cat.items[0], { id: 'demo-item', title: 'Demo item', units: '10000' });
+
+  let transfers = [];
+  setFetch((url) => url.includes('/jetton/wallets')
+    ? { jetton_wallets: [{ address: PAYER_JW_RAW, balance: '50000', owner: PAYER_RAW, jetton: USDT_RAW }] }
+    : { jetton_transfers: transfers });
+
+  const { payment, message } = await createUsdtPayment({ itemId: 'demo-item', payerAddress: PAYER_RAW }, ctx());
+  assert.match(payment.reference, /^UP-[A-Z2-9]{8}$/);
+  assert.equal(payment.units, '10000');
+
+  // The wallet lookup asked for the payer's wallet of the official USDT token.
+  const lookup = new URL(fetchCalls[0].url);
+  assert.equal(lookup.pathname, '/api/v3/jetton/wallets');
+  assert.equal(lookup.searchParams.get('owner_address'), PAYER_RAW);
+  assert.equal(cells.toRawAddress(lookup.searchParams.get('jetton_address')), USDT_RAW);
+
+  // The message goes to the payer's jetton wallet with 0.05 TON for fees,
+  // and its body sends 10000 units to the receiver with the reference.
+  assert.equal(cells.toRawAddress(message.address), PAYER_JW_RAW);
+  assert.match(message.address, /^EQ/, 'bounceable mainnet form');
+  assert.equal(message.amount, '50000000');
+  const body = cells.parseBoc(message.payload);
+  assert.equal(cells.readComment(body.refs[0]), payment.reference);
+
+  // Not on-chain yet.
+  let res = await checkUsdtPayment({ paymentId: payment.id }, ctx());
+  assert.equal(res.payment.status, 'pending');
+  const q = new URL(fetchCalls.at(-1).url);
+  assert.equal(q.pathname, '/api/v3/jetton/transfers');
+  assert.equal(q.searchParams.get('direction'), 'in');
+
+  // A fake token with the right comment must not count; the real one does.
+  const transfer = (over) => ({
+    transaction_hash: 'TXU1', transaction_aborted: false, jetton_master: USDT_RAW,
+    source: PAYER_RAW, destination: RECEIVER_RAW, amount: '10000',
+    decoded_forward_payload: { type: 'text_comment', comment: payment.reference }, ...over,
+  });
+  transfers = [transfer({ jetton_master: '0:' + '99'.repeat(32), transaction_hash: 'FAKE' })];
+  res = await checkUsdtPayment({ paymentId: payment.id }, ctx());
+  assert.equal(res.payment.status, 'pending', 'fake token ignored');
+
+  transfers.push(transfer());
+  res = await checkUsdtPayment({ paymentId: payment.id }, ctx());
+  assert.equal(res.payment.status, 'paid');
+  assert.equal(res.payment.txHash, 'TXU1');
+  await checkUsdtPayment({ paymentId: payment.id }, ctx());
+  assert.deepEqual(sent().map((m) => m.chat_id), [BUYER, ADMIN], 'notified exactly once');
+
+  await assert.rejects(checkUsdtPayment({ paymentId: payment.id }, ctx(7)), (e) => e.parameters?.code === 'NOT_FOUND');
+});
+
+test('usdt-payments: matcher checks token, receiver, amount, comment and abort', async () => {
+  const { usdt, cells } = await usdtSetup();
+  const ref = 'UP-AAAAAAAA';
+  const args = { reference: ref, units: '10000', jettonMaster: usdt.usdtSettings.jettonMaster, receiver: RECEIVER_RAW };
+  const ok = { transaction_hash: 'h', transaction_aborted: false, jetton_master: USDT_RAW, destination: RECEIVER_RAW, amount: '10000', decoded_forward_payload: { comment: ref } };
+  assert.ok(usdt.findUsdtPayment([ok], args));
+  assert.ok(usdt.findUsdtPayment([{ ...ok, amount: '20000' }], args), 'overpayment accepted');
+  // Comment only in the raw forward_payload (no decoded field) still works.
+  const rawPayload = cells.bytesToBase64(cells.serializeBoc(cells.commentCell(ref)));
+  assert.ok(usdt.findUsdtPayment([{ ...ok, decoded_forward_payload: undefined, forward_payload: rawPayload }], args));
+  for (const bad of [
+    { ...ok, jetton_master: '0:' + '99'.repeat(32) },
+    { ...ok, destination: '0:' + '44'.repeat(32) },
+    { ...ok, amount: '9999' },
+    { ...ok, transaction_aborted: true },
+    { ...ok, decoded_forward_payload: { comment: 'UP-BBBBBBBB' } },
+    { ...ok, decoded_forward_payload: null, forward_payload: null },
+  ]) assert.equal(usdt.findUsdtPayment([bad], args), null);
+  assert.equal(usdt.toUnits('0.01', 6), '10000');
+  assert.equal(usdt.toUnits('12.345678', 6), '12345678');
+  assert.throws(() => usdt.toUnits('0.0000001', 6));
+  assert.equal(usdt.formatUnits('10000', 6), '0.01');
+});
+
+test('usdt-payments: refuses missing USDT, low balance, bad address, unconfigured', async () => {
+  const { usdt } = await usdtSetup();
+  const createUsdtPayment = await load(ALL, 'tgcloud/endpoints/createUsdtPayment.js');
+  setFetch({ jetton_wallets: [] });
+  await assert.rejects(createUsdtPayment({ itemId: 'demo-item', payerAddress: PAYER_RAW }, ctx()), (e) => e.parameters?.code === 'NO_USDT');
+  setFetch({ jetton_wallets: [{ address: PAYER_JW_RAW, balance: '9999' }] });
+  await assert.rejects(createUsdtPayment({ itemId: 'demo-item', payerAddress: PAYER_RAW }, ctx()), (e) => e.parameters?.code === 'NOT_ENOUGH_USDT');
+  await assert.rejects(createUsdtPayment({ itemId: 'demo-item', payerAddress: 'nope' }, ctx()), (e) => e.parameters?.code === 'BAD_ADDRESS');
+  setFetch({}, 500);
+  await assert.rejects(createUsdtPayment({ itemId: 'demo-item', payerAddress: PAYER_RAW }, ctx()), (e) => e.parameters?.code === 'NETWORK');
+  assert.equal(rows(schema.usdtPayments).length, 0, 'no pending rows left behind');
+  usdt.usdtSettings.receiverAddress = 'PASTE_YOUR_TON_WALLET_ADDRESS';
+  await assert.rejects(createUsdtPayment({ itemId: 'demo-item', payerAddress: PAYER_RAW }, ctx()), (e) => e.parameters?.code === 'NOT_CONFIGURED');
 });

@@ -33,9 +33,11 @@ export const sent = () => apiCalls.filter((c) => c.method === 'sendMessage').map
 export let fetchResponse = { status: 200, json: {} };
 export function setFetch(json, status = 200) { fetchResponse = { status, json }; }
 export const fetchCalls = [];
+// setFetch(json) answers every request the same; setFetch((url) => json) answers per URL.
 export async function fetch(url, init) {
   fetchCalls.push({ url, init });
-  const { status, json } = fetchResponse;
+  const { status } = fetchResponse;
+  const json = typeof fetchResponse.json === 'function' ? fetchResponse.json(String(url)) : fetchResponse.json;
   return { ok: status >= 200 && status < 300, status, statusText: String(status), json: async () => json, text: async () => JSON.stringify(json) };
 }
 
