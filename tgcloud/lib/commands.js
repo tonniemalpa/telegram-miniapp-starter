@@ -28,7 +28,15 @@ export async function myid(message) {
   return safeSend(message.chat.id, `Your Telegram user ID: ${message.from?.id}`);
 }
 
-// Reply to anything that is not a known command.
+// Reply to a /command that is not registered, e.g. a typo like /delivery.
+// Admin-only commands also use it for non-admins, as if the command did not exist.
+export async function unknownCommand(message) {
+  if (!isConfigured()) return start(message);
+  const name = (message.text ?? '').trim().split(/\s+/)[0].split('@')[0];
+  return safeSend(message.chat.id, `Unknown command: ${name}\nSend /help to see the commands.`);
+}
+
+// Reply to any other message.
 export async function fallback(message) {
   if (!isConfigured()) return start(message);
   return safeSend(message.chat.id, 'Tap the button below to open the app.',

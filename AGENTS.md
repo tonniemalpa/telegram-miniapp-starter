@@ -30,6 +30,7 @@ Do not invent commands, APIs or options. If the docs don't answer something, say
 | Do this | Where |
 |---|---|
 | Add a screen or UI | `web/`. Small features: a card module registered in `web/features.js`. Bigger apps: replace the home screen in `index.html` and `app.js` |
+| Remove the starter screen | Delete the `STARTER ONLY` block in `web/index.html` and `renderStarter` in `web/app.js`. Keep the `getMe` call: it records each user and runs new-user hooks |
 | Add an endpoint | `tgcloud/endpoints/<name>.js`, default export `async (input, ctx)` |
 | Add a table | `tgcloud/schema.js`, then push and migrate |
 | Add a bot command | A function in `tgcloud/lib/`, registered in `commands` in `tgcloud/lib/extensions.js` |
@@ -59,7 +60,7 @@ Adapt a recipe after adding it: rename tables and labels to fit the user's idea,
 ## LaPoe live chat (keep it working)
 
 - The user pastes the snippet from the **Mini App section of their LaPoe dashboard** (https://lapoe.app) into `web/index.html`, on the line under the `LaPoe live chat` comment. The snippet looks like `<script src="https://lapoe.app/widget.js" data-lapoe-key="lp_..." defer></script>`. Never make them dig out the key. If you can't see the dashboard, ask them to paste the snippet. Never ask for their password.
-- The widget exposes `window.LaPoe.open()`, `close()` and `reset()`, and shows its own floating chat button. The Support button calls `openSupport()` in `web/lapoe.js`. Keep a visible way to reach support in every layout, and don't cover the floating button with fixed bottom bars.
+- The widget exposes `window.LaPoe.open()`, `close()` and `reset()`, and shows its own floating chat button. The Support button calls `openSupport()` in `web/lapoe.js`. Keep a visible way to reach support in every layout, and don't cover the floating button with fixed bottom bars. Keep the large bottom padding in `styles.css`, so the button never hides the last item on a screen.
 - The app address (`https://app<id>.tgcloud.ai`) must be added to the allowed domains in the LaPoe dashboard. With or without `https://` both work.
 - Suggest that the user add their app's FAQ to LaPoe Knowledge, so the chat gives real answers.
 - Test inside Telegram: the chat opens, a message sends, LaPoe replies, and the app keeps working.
@@ -69,14 +70,17 @@ Adapt a recipe after adding it: rename tables and labels to fit the user's idea,
 1. Understand their idea. Ask only the questions that change the build.
 2. Get the starter running first, by following `README.md`: deployed, opened from the bot, "Hello, <name>" showing, and LaPoe answering. Fix setup problems before writing features.
 3. Plan: which screens, endpoints, tables, commands and recipes. Agree the plan with the user.
-4. Build in small stages. After each one, deploy, then test with `npx tgcloud run` and inside Telegram.
+4. Build in small stages. After each one, deploy, then test with `npx tgcloud run` and inside Telegram. Commit once a stage works, so there is always a working version to go back to.
 5. Finish with a full test in Telegram, and list honestly anything that wasn't tested.
 
-The user does some steps by hand, because an agent can't: everything in @BotFather (Serverless switch, CLI token, Mini App URL), the LaPoe dashboard, and tests on their phone. Give exact instructions for those and wait for the result.
+The user does some steps by hand, because an agent can't: everything in @BotFather (Serverless switch, CLI token, Mini App URL), `npx tgcloud login`, the LaPoe dashboard, and tests on their phone. Give exact instructions for those and wait for the result.
+
+When the user must run a command, tell them exactly how to open a terminal in the project folder in their editor (in VS Code: **Terminal** menu, then **New Terminal**). If you installed software such as Node.js or Git, first tell them to fully close and reopen the editor: open terminals keep the old PATH, so `npx` shows as "not recognized".
 
 ## Code and UI quality
 
 - Give or write **complete files**, not fragments, and state the exact path and whether the file is new or replaced.
+- The finished app shows none of the starter's text: no greeting card, visit count or "Start building" card, unless the user's idea uses them.
 - Front end: reuse `web/styles.css` (`card`, `primary`, `secondary`, `small`, `list`, `row`, `stack`, `muted`, `error`, `success`). Never leave unstyled default buttons. Follow Telegram theme variables so light and dark mode both work. Every action shows loading, success and error states.
 - Use `textContent` for user or server data, never `innerHTML` with it.
 - Files must be UTF-8. Tell users to edit in a code editor such as VS Code, never to create code files with PowerShell `echo`, `>` or `Set-Content`, which can turn emoji into `?`.

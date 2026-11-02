@@ -166,6 +166,7 @@ test('stars-payments: invoice -> pre-checkout -> successful_payment -> refund', 
   // Only the admin can refund.
   await onMessage(msg(BUYER, `/refund ${p.reference}`));
   assert.equal(apiCalls.filter((c) => c.method === 'refundStarPayment').length, 0);
+  assert.match(sent().at(-1).text, /^Unknown command: \/refund/);
   await onMessage(msg(ADMIN, `/refund ${p.reference.toLowerCase()}`));
   const refund = apiCalls.find((c) => c.method === 'refundStarPayment').params;
   assert.deepEqual(refund, { user_id: BUYER, telegram_payment_charge_id: 'CHARGE1' });
@@ -273,7 +274,7 @@ test('admin-notifications: new user alert once; /stats admin only', async () => 
   assert.match(alerts[0].text, /New user: Ann @ann_test \(id 42\)/);
 
   await onMessage(msg(BUYER, '/stats'));
-  assert.ok(sent().at(-1).reply_markup, 'non-admin gets the normal reply');
+  assert.equal(sent().at(-1).text, 'Unknown command: /stats\nSend /help to see the commands.', 'non-admin: as if it did not exist');
   await onMessage(msg(ADMIN, '/stats'));
   assert.match(sent().at(-1).text, /^Users: 1/);
 });

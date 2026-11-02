@@ -2,7 +2,7 @@ import { api, db } from 'sdk';
 import { eq, and } from 'sdk/db';
 import { starsPurchases } from '../schema.js';
 import { safeSend, notifyAdmin, isAdmin } from './notify.js';
-import { fallback } from './commands.js';
+import { unknownCommand } from './commands.js';
 
 // ---------------------------------------------------------------------------
 // What users can buy with Telegram Stars. Telegram requires Stars (currency
@@ -75,7 +75,7 @@ export async function paySupport(message, args) {
 
 // /refund SP-XXXXXXXXXX  (admin only)
 export async function refundStars(message, args) {
-  if (!isAdmin(message.from?.id)) return fallback(message);
+  if (!isAdmin(message.from?.id)) return unknownCommand(message);
   const payload = (args || '').trim().toUpperCase();
   if (!payload) return safeSend(message.chat.id, 'Usage: /refund SP-XXXXXXXXXX');
 

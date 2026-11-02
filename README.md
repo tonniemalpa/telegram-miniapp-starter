@@ -105,7 +105,7 @@ Each recipe prints its next steps, usually `npx tgcloud push` and `npx tgcloud m
 
 ```
 web/                     Front end, deployed as-is by `tgcloud push`
-  index.html             Page shell
+  index.html             Page shell (the STARTER ONLY card is a placeholder)
   app.js                 Loads the user, mounts feature cards
   api.js                 call(endpoint, input) and errorText(err)
   features.js            Feature cards on the home screen (recipes register here)
@@ -141,6 +141,7 @@ npm test              # local tests
 
 ## Troubleshooting
 
+- **"'npx' is not recognized".** Node.js is missing, or was installed after the editor opened. Install Node.js LTS from https://nodejs.org, then fully close and reopen your editor and terminal.
 - **"Open this app from its bot inside Telegram".** The page was opened in a normal browser. Endpoints only work inside Telegram.
 - **The bot doesn't answer.** Run `npx tgcloud webhook`. If it's out of sync, run `npx tgcloud webhook sync`.
 - **The page shows old content after a change.** Run `npx tgcloud push` again and reopen the app.

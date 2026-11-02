@@ -10,7 +10,7 @@ npm run recipe -- admin-notifications
 
 - **New user alerts.** The admin gets a message the first time someone opens the Mini App. Turn this off in `adminSettings.notifyNewUsers` once the app is busy.
 - **`/stats`.** Total users, new users and active users in the last 24 hours. Admin only.
-- **`adminOnly(command)`.** Wrap any command so only the admin can run it. Others get the normal reply.
+- **`adminOnly(command)`.** Wrap any command so only the admin can run it. Anyone else gets the "Unknown command" reply, as if it did not exist.
 - `notifyAdmin(text)` and `isAdmin(id)` come with the starter, in `tgcloud/lib/notify.js`.
 
 ## Files

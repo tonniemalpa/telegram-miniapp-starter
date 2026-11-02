@@ -23,25 +23,21 @@
   </header>
 
   <main>
-    <div id="fatal" class="notice error" hidden></div>
+    <div id="notice" class="notice error" hidden>
+      <span id="notice-text"></span>
+      <button id="notice-retry" class="link" type="button" hidden>Try again</button>
+    </div>
+    <p id="loading" class="muted">Loading…</p>
 
-    <section class="card" id="me-card">
-      <div id="me-loading" class="muted">Loading…</div>
-      <div id="me-error" class="error" hidden>
-        <span id="me-error-text"></span>
-        <button id="me-retry" class="link" type="button">Try again</button>
-      </div>
-      <div id="me" hidden>
-        <h1 id="greeting"></h1>
-        <p class="muted" id="visits"></p>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>Start building</h2>
+    <!-- STARTER ONLY: placeholder card. Delete this section (and renderStarter in app.js)
+         when you build the app's own screens. -->
+    <section class="card" id="starter" hidden>
+      <h1 id="greeting"></h1>
+      <p class="muted" id="visits"></p>
       <p>This is the starter screen. Describe your idea to your AI and it will build it here.</p>
       <p class="muted small">Front end: <code>web/</code> · Backend: <code>tgcloud/</code> · Guide for AI: <code>AGENTS.md</code></p>
     </section>
+    <!-- END STARTER ONLY -->
 
     <div id="features"></div>
   </main>

@@ -4,25 +4,38 @@ import { openSupport } from './lapoe.js';
 
 const tg = window.Telegram?.WebApp;
 const $ = (id) => document.getElementById(id);
-const show = (el, visible = true) => { el.hidden = !visible; };
+const show = (el, visible = true) => { if (el) el.hidden = !visible; };
 
+function showNotice(text, retry = false) {
+  $('notice-text').textContent = text;
+  show($('notice-retry'), retry);
+  show($('notice'), Boolean(text));
+}
+
+// STARTER ONLY: fills the placeholder card in index.html. Delete it with the card.
+function renderStarter(me) {
+  if (!$('starter')) return;
+  $('greeting').textContent = `Hello, ${me.firstName || 'there'}`;
+  $('visits').textContent = me.visits === 1
+    ? 'Welcome! This is your first visit.'
+    : `You have opened this app ${me.visits} times.`;
+  show($('starter'));
+}
+
+// getMe records the user and the visit (and runs new-user hooks such as admin alerts).
+// Keep this call when you replace the starter screen; `me` is passed to every feature.
 async function loadMe() {
-  show($('me-loading'));
-  show($('me-error'), false);
+  show($('loading'));
+  showNotice('');
   try {
     const me = await call('getMe');
-    $('greeting').textContent = `Hello, ${me.firstName || 'there'}`;
-    $('visits').textContent = me.visits === 1
-      ? 'Welcome! This is your first visit.'
-      : `You have opened this app ${me.visits} times.`;
-    show($('me'));
+    renderStarter(me);
     return me;
   } catch (err) {
-    $('me-error-text').textContent = errorText(err);
-    show($('me-error'));
+    showNotice(errorText(err), true);
     return null;
   } finally {
-    show($('me-loading'), false);
+    show($('loading'), false);
   }
 }
 
@@ -49,16 +62,15 @@ async function mountFeatures(me) {
 
 async function boot() {
   if (!tg?.initData) {
-    $('fatal').textContent = 'Open this app from its bot inside Telegram.';
-    show($('fatal'));
-    show($('me-card'), false);
+    show($('loading'), false);
+    showNotice('Open this app from its bot inside Telegram.');
     return;
   }
   tg.ready();
   tg.expand();
 
   $('support-btn').addEventListener('click', openSupport);
-  $('me-retry').addEventListener('click', loadMe);
+  $('notice-retry').addEventListener('click', loadMe);
 
   const me = await loadMe();
   await mountFeatures(me);

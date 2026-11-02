@@ -2,7 +2,7 @@ import { db } from 'sdk';
 import { sql } from 'sdk/db';
 import { users } from '../schema.js';
 import { isAdmin, notifyAdmin, safeSend } from './notify.js';
-import { fallback } from './commands.js';
+import { unknownCommand } from './commands.js';
 
 // Admin features. The admin is config.adminChatId in lib/config.js.
 export const adminSettings = {
@@ -12,10 +12,10 @@ export const adminSettings = {
 };
 
 // Wraps a command so only the admin can use it. Anyone else gets the
-// normal reply, as if the command did not exist.
+// same reply as an unknown command.
 export function adminOnly(command) {
   return async (message, args) => {
-    if (!isAdmin(message.from?.id)) return fallback(message);
+    if (!isAdmin(message.from?.id)) return unknownCommand(message);
     return command(message, args);
   };
 }

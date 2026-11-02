@@ -45,6 +45,11 @@ test('unknown text gets the open-app reply; group messages are ignored', async (
   assert.equal(sent().length, 1);
 });
 
+test('an unknown /command names the command and points to /help', async () => {
+  await onMessage(msg(42, '/delivery@my_bot 4'));
+  assert.equal(sent()[0].text, 'Unknown command: /delivery\nSend /help to see the commands.');
+});
+
 test('unconfigured miniAppUrl gives a setup hint instead of a broken button', async () => {
   config.miniAppUrl = 'https://appXXXXXX.tgcloud.ai/';
   await onMessage(msg(42, '/start'));

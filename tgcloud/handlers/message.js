@@ -1,5 +1,5 @@
 import { commands, messageHooks } from '../lib/extensions.js';
-import { fallback } from '../lib/commands.js';
+import { fallback, unknownCommand } from '../lib/commands.js';
 
 // Every message sent to the bot. Logic lives in lib/; register features in lib/extensions.js.
 export default async function (message) {
@@ -15,6 +15,7 @@ export default async function (message) {
     const name = first.split('@')[0].toLowerCase();   // "/start@my_bot" -> "/start"
     const command = commands[name];
     if (command) return command(message, rest.join(' '));
+    return unknownCommand(message);
   }
 
   return fallback(message);

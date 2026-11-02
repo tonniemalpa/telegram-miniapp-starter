@@ -22,7 +22,8 @@ export default {
       <div class="row"><span class="muted small network"></span><div id="ton-connect-button"></div></div>
       <ul class="list"></ul>
       <p class="status" hidden></p>`;
-    el.querySelector('.network').textContent = catalog.network === 'testnet' ? 'Testnet: no real money' : 'Mainnet';
+    // Buyers only need a label on testnet; the wallet button speaks for itself.
+    el.querySelector('.network').textContent = catalog.network === 'testnet' ? 'Testnet: no real money' : '';
     const list = el.querySelector('ul');
     const status = el.querySelector('.status');
     const setStatus = (text, kind = 'muted') => {
